@@ -1,4 +1,3 @@
-
 import express from "express";
 import User from "../models/userSchema.mjs";
 import Cart from "../models/cartSchema.mjs";
@@ -41,5 +40,45 @@ await user.save();
 
 res.status(201).json({ userId: user._id, cartId: cart._id });
 });
+
+// POST Login Route
+// make sure req.body has email & password
+// data validation
+//res with error
+// check if user exists in db
+// res with error
+// check if user pw matches req.body password
+// res w/ error
+// res with userId
+
+
+
+// @route: POST /api/user/login
+// @desc:  login user route
+// @access: Public
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // make sure req.body has email & password
+  if (!email || !password) {
+    return res.status(400).json({ msg: "All fields are required" });
+  }
+
+  // check if user exists in db
+  let user = await User.findOne({ email });
+  // if they do NOT exist, return with error
+  if (!user) {
+    return res.status(400).json({ msg: "Invalid Credentials" });
+  }
+
+  // Check to see if password matches, if not return error
+  if (password !== user.password) {
+    return res.status(400).json({ msg: "Invalid Credentials" });
+  }
+
+  // res with userId
+  res.json({ userId: user._id, cartId: user.cart });
+});
+
 
 export default router;
